@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-
+import { Request, Response, NextFunction } from 'express';
+import { Prisma } from '@prisma/client';
 import ErrorResponse from './interfaces/ErrorResponse';
 
 export function notFound(req: Request, res: Response, next: NextFunction) {
@@ -8,12 +8,25 @@ export function notFound(req: Request, res: Response, next: NextFunction) {
   next(error);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function errorHandler(err: Error, req: Request, res: Response<ErrorResponse>, next: NextFunction) {
+export function errorHandler(
+  err: Error,
+  req: Request,
+  res: Response<ErrorResponse>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: NextFunction,
+) {
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
-  res.status(statusCode);
-  res.json({
-    message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack,
+
+  const isPrismaError =
+    err instanceof Prisma.PrismaClientInitializationError ||
+    err instanceof Prisma.PrismaClientKnownRequestError ||
+    err instanceof Prisma.PrismaClientUnknownRequestError ||
+    err instanceof Prisma.PrismaClientRustPanicError;
+
+  res.status(statusCode).json({
+    message: isPrismaError
+      ? 'Error interno del servidor. La base de datos no está disponible.'
+      : err.message,
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
   });
 }

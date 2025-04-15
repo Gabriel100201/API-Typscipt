@@ -25,6 +25,10 @@ app.get<{}, MessageResponse>('/', (req, res) => {
 
 app.use('/api/v1', api);
 
+app.get('/error-test', () => {
+  throw new Error('Forzando error para probar handler');
+});
+
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
 

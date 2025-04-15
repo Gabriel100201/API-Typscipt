@@ -14,10 +14,12 @@ export const createUser = async (data: {
   });
   if (existingUser) throw new Error('El correo ya está registrado');
 
-  const hashedPassword = await bcrypt.hash(data.contrasena, 10);
+  const { contrasena, ...restData } = data;
+
+  const hashedPassword = await bcrypt.hash(contrasena, 10);
   return prisma.usuarios.create({
     data: {
-      ...data,
+      ...restData,
       contrasena_hash: hashedPassword,
     },
   });
