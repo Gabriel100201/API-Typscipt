@@ -1,9 +1,9 @@
 import express from 'express';
 
 import MessageResponse from '../interfaces/MessageResponse';
-import emojis from './emojis';
-import products from './products.routes';
-import users from './user.routes';
+import users from './usuario.routes';
+import auth from './auth.routes';
+import register from './register.routes';
 
 const router = express.Router();
 
@@ -13,8 +13,8 @@ router.get<{}, MessageResponse>('/', (req, res) => {
   });
 });
 
-router.use('/emojis', emojis);
-router.use('/products', products);
 router.use('/users', users);
+router.use('/auth', auth);
+router.use('/register', register);
 
 export default router;

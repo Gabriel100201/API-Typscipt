@@ -4,15 +4,20 @@
     "sourceMap": true,
     "target": "esnext",
     "module": "commonjs",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node"]
   },
   "include": [
-    "./*.js",
     "src/**/*.ts",
-    "test/**/*.ts",
+    "test/**/*.ts"
   ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

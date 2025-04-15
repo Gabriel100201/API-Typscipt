@@ -7,14 +7,192 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
+model consultorio_profesionales {
+  id             Int            @id @default(autoincrement())
+  id_consultorio Int?
+  id_profesional Int?
+  consultorios   consultorios?  @relation(fields: [id_consultorio], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profesionales  profesionales? @relation(fields: [id_profesional], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([id_consultorio, id_profesional])
 }
 
-model Product {
-  id Int @id @default(autoincrement())
-  name String
-  price Int
+model consultorios {
+  id                        Int                         @id @default(autoincrement())
+  nombre                    String                      @db.VarChar(255)
+  descripcion               String?
+  id_usuario_plus           Int?
+  requiere_pago             Boolean?                    @default(false)
+  precio_turno              Decimal?                    @db.Decimal(10, 2)
+  fecha_creacion            DateTime?                   @default(now()) @db.Timestamp(6)
+  consultorio_profesionales consultorio_profesionales[]
+  usuarios                  usuarios?                   @relation(fields: [id_usuario_plus], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model dias_operativos {
+  id                  Int                   @id @default(autoincrement())
+  id_profesional      Int?
+  dia_semana          dia_semana
+  activo              Boolean?              @default(true)
+  fecha_creacion      DateTime?             @default(now()) @db.Timestamp(6)
+  fecha_actualizacion DateTime?             @default(now()) @db.Timestamp(6)
+  profesionales       profesionales?        @relation(fields: [id_profesional], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  horarios_operativos horarios_operativos[]
+
+  @@unique([id_profesional, dia_semana])
+}
+
+model excepciones {
+  id                   Int                    @id @default(autoincrement())
+  id_profesional       Int?
+  fecha_inicio         DateTime               @db.Date
+  fecha_fin            DateTime               @db.Date
+  tipo                 tipo_excepcion
+  descripcion          String?
+  activo               Boolean?               @default(true)
+  fecha_creacion       DateTime?              @default(now()) @db.Timestamp(6)
+  fecha_actualizacion  DateTime?              @default(now()) @db.Timestamp(6)
+  profesionales        profesionales?         @relation(fields: [id_profesional], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  horarios_excepciones horarios_excepciones[]
+}
+
+model horarios_excepciones {
+  id                  Int          @id @default(autoincrement())
+  id_excepcion        Int?
+  hora_inicio         DateTime     @db.Time(6)
+  hora_fin            DateTime     @db.Time(6)
+  duracion_turno      Int
+  capacidad           Int
+  fecha_creacion      DateTime?    @default(now()) @db.Timestamp(6)
+  fecha_actualizacion DateTime?    @default(now()) @db.Timestamp(6)
+  excepciones         excepciones? @relation(fields: [id_excepcion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  turnos              turnos[]
+}
+
+model horarios_operativos {
+  id                  Int              @id @default(autoincrement())
+  id_dia_operativo    Int?
+  hora_inicio         DateTime         @db.Time(6)
+  hora_fin            DateTime         @db.Time(6)
+  duracion_turno      Int
+  capacidad           Int
+  fecha_creacion      DateTime?        @default(now()) @db.Timestamp(6)
+  fecha_actualizacion DateTime?        @default(now()) @db.Timestamp(6)
+  dias_operativos     dias_operativos? @relation(fields: [id_dia_operativo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  turnos              turnos[]
+}
+
+model pagos_reservas {
+  id                    Int          @id @default(autoincrement())
+  id_reserva            Int?
+  estado_pago           estado_pago? @default(PENDIENTE)
+  mp_preference_id      String?      @db.VarChar(255)
+  mp_payment_id         String?      @db.VarChar(255)
+  mp_external_reference String?      @db.VarChar(255)
+  fecha_creacion        DateTime?    @default(now()) @db.Timestamp(6)
+  reservas              reservas?    @relation(fields: [id_reserva], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model profesionales {
+  id                        Int                         @id @default(autoincrement())
+  nombre                    String                      @db.VarChar(255)
+  especialidad              String?                     @db.VarChar(255)
+  correo                    String                      @unique @db.VarChar(255)
+  telefono                  String?                     @db.VarChar(20)
+  fecha_creacion            DateTime?                   @default(now()) @db.Timestamp(6)
+  fecha_actualizacion       DateTime?                   @default(now()) @db.Timestamp(6)
+  correo_notificacion_      String?                     @map("correo_notificacion ") @db.VarChar(255)
+  consultorio_profesionales consultorio_profesionales[]
+  dias_operativos           dias_operativos[]
+  excepciones               excepciones[]
+  turnos                    turnos[]
+  turnos_generados_log      turnos_generados_log[]
+}
+
+model reservas {
+  id                  Int              @id @default(autoincrement())
+  id_usuario          Int?
+  id_turno            Int?
+  fecha_reserva       DateTime?        @default(now()) @db.Timestamp(6)
+  estado              estado_reserva?  @default(RESERVADO)
+  fecha_creacion      DateTime?        @default(now()) @db.Timestamp(6)
+  fecha_actualizacion DateTime?        @default(now()) @db.Timestamp(6)
+  pagos_reservas      pagos_reservas[]
+  turnos              turnos?          @relation(fields: [id_turno], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios            usuarios?        @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model turnos {
+  id                   Int                   @id @default(autoincrement())
+  id_profesional       Int?
+  fecha                DateTime              @db.Date
+  hora_inicio          DateTime              @db.Time(6)
+  hora_fin             DateTime              @db.Time(6)
+  capacidad            Int
+  reservados           Int?                  @default(0)
+  id_horario_operativo Int?
+  id_horario_excepcion Int?
+  fecha_creacion       DateTime?             @default(now()) @db.Timestamp(6)
+  fecha_actualizacion  DateTime?             @default(now()) @db.Timestamp(6)
+  reservas             reservas[]
+  horarios_excepciones horarios_excepciones? @relation(fields: [id_horario_excepcion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  horarios_operativos  horarios_operativos?  @relation(fields: [id_horario_operativo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profesionales        profesionales?        @relation(fields: [id_profesional], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([id_profesional, fecha, hora_inicio])
+}
+
+model turnos_generados_log {
+  id              Int            @id @default(autoincrement())
+  id_profesional  Int?
+  fecha           DateTime       @db.Date
+  origen          String?
+  total_generados Int
+  fecha_ejecucion DateTime?      @default(now()) @db.Timestamp(6)
+  profesionales   profesionales? @relation(fields: [id_profesional], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model usuarios {
+  id                  Int                @id @default(autoincrement())
+  nombre              String             @db.VarChar(255)
+  correo              String             @unique @db.VarChar(255)
+  telefono            String?            @db.VarChar(20)
+  contrasena_hash     String             @db.VarChar(255)
+  fecha_creacion      DateTime?          @default(now()) @db.Timestamp(6)
+  fecha_actualizacion DateTime?          @default(now()) @db.Timestamp(6)
+  tipo_usuario        tipo_usuario_enum? @default(NORMAL)
+  consultorios        consultorios[]
+  reservas            reservas[]
+}
+
+enum dia_semana {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+enum estado_pago {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
+enum estado_reserva {
+  RESERVADO
+  COMPLETADO
+  CANCELADO
+}
+
+enum tipo_excepcion {
+  FERIADO
+  ESPECIAL
+}
+
+enum tipo_usuario_enum {
+  NORMAL
+  PLUS
 }
