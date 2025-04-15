@@ -102,9 +102,11 @@ model profesionales {
   fecha_creacion            DateTime?                   @default(now()) @db.Timestamp(6)
   fecha_actualizacion       DateTime?                   @default(now()) @db.Timestamp(6)
   correo_notificacion_      String?                     @map("correo_notificacion ") @db.VarChar(255)
+  id_usuario                Int?                        @unique(map: "profesionales_id_usuario_unique")
   consultorio_profesionales consultorio_profesionales[]
   dias_operativos           dias_operativos[]
   excepciones               excepciones[]
+  usuarios                  usuarios?                   @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
   turnos                    turnos[]
   turnos_generados_log      turnos_generados_log[]
 }
@@ -162,6 +164,7 @@ model usuarios {
   fecha_actualizacion DateTime?          @default(now()) @db.Timestamp(6)
   tipo_usuario        tipo_usuario_enum? @default(NORMAL)
   consultorios        consultorios[]
+  profesionales       profesionales?
   reservas            reservas[]
 }
 
