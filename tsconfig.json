@@ -21,7 +21,7 @@
     "test/**/*.ts",
     "src/types/**/*.d.ts",
     "src/types/**/*.ts"
-  ],
+, "src/controllers/excepciones.controller.ts"  ],
   "exclude": [
     "node_modules",
     "dist"
