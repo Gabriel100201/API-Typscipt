@@ -4,6 +4,7 @@ import MessageResponse from '../interfaces/MessageResponse';
 import users from './usuario.routes';
 import auth from './auth.routes';
 import register from './register.routes';
+import consultorios from './consultorio.routes';
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.get<{}, MessageResponse>('/', (req, res) => {
 router.use('/users', users);
 router.use('/auth', auth);
 router.use('/register', register);
+router.use('/consultorios', consultorios);
 
 export default router;

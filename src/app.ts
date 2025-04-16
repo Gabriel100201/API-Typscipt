@@ -3,10 +3,9 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
 
-import * as middlewares from './middlewares';
 import api from './api';
 import MessageResponse from './interfaces/MessageResponse';
-
+import { errorHandler, notFound } from './middlewares';
 
 require('dotenv').config();
 
@@ -29,7 +28,7 @@ app.get('/error-test', () => {
   throw new Error('Forzando error para probar handler');
 });
 
-app.use(middlewares.notFound);
-app.use(middlewares.errorHandler);
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;
