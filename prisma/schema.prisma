@@ -97,7 +97,6 @@ model profesionales {
   id                        Int                         @id @default(autoincrement())
   nombre                    String                      @db.VarChar(255)
   especialidad              String?                     @db.VarChar(255)
-  correo                    String                      @unique @db.VarChar(255)
   telefono                  String?                     @db.VarChar(20)
   fecha_creacion            DateTime?                   @default(now()) @db.Timestamp(6)
   fecha_actualizacion       DateTime?                   @default(now()) @db.Timestamp(6)
