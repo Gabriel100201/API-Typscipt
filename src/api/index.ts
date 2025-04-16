@@ -6,6 +6,7 @@ import auth from './auth.routes';
 import register from './register.routes';
 import consultorios from './consultorio.routes';
 import profesionales from './profesional.routes';
+import disponibilidad from './disponibilidad.routes';
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use('/auth', auth);
 router.use('/register', register);
 router.use('/consultorios', consultorios);
 router.use('/profesionales', profesionales);
+router.use('/disponibilidad', disponibilidad);
 
 export default router;
