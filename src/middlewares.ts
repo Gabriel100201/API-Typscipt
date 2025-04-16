@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
 import ErrorResponse from './interfaces/ErrorResponse';
+import jwt from 'jsonwebtoken';
+import { AuthPayload } from './types/auth';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 export function notFound(req: Request, res: Response, next: NextFunction) {
   res.status(404);
@@ -30,3 +34,21 @@ export function errorHandler(
     stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
   });
 }
+
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const auth = req.headers.authorization;
+
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Token no enviado' });
+  }
+
+  const token = auth.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Token inválido' });
+  }
+};

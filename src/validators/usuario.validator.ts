@@ -7,3 +7,8 @@ export const crearUsuarioSchema = z.object({
   contrasena: z.string().min(6),
   tipo_usuario: z.enum(['NORMAL', 'PLUS']).optional(),
 });
+
+export const actualizarUsuarioSchema = z.object({
+  nombre: z.string().min(1).optional(),
+  telefono: z.string().min(5).optional(),
+});
