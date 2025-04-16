@@ -7,7 +7,7 @@ import register from './register.routes';
 import consultorios from './consultorio.routes';
 import profesionales from './profesional.routes';
 import disponibilidad from './disponibilidad.routes';
-
+import turnos from './turno.routes';
 const router = express.Router();
 
 router.get<{}, MessageResponse>('/', (req, res) => {
@@ -22,5 +22,6 @@ router.use('/register', register);
 router.use('/consultorios', consultorios);
 router.use('/profesionales', profesionales);
 router.use('/disponibilidad', disponibilidad);
+router.use('/turnos', turnos);
 
 export default router;
