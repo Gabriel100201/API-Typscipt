@@ -33,11 +33,15 @@ export const crearReserva = async (id_usuario: number, id_turno: number) => {
 
   if (existente) throw new Error('Ya reservaste este turno');
 
+  const consultorio = turno.profesionales?.consultorio_profesionales?.[0]?.consultorios;
+  const requierePago = consultorio?.requiere_pago ?? false;
+
   const nuevaReserva = await prisma.$transaction(async (tx) => {
     const reserva = await tx.reservas.create({
       data: {
         id_usuario,
         id_turno,
+        estado: requierePago ? 'PENDIENTE' : 'RESERVADO',
       },
     });
 

@@ -187,6 +187,7 @@ enum estado_reserva {
   RESERVADO
   COMPLETADO
   CANCELADO
+  PENDIENTE
 }
 
 enum tipo_excepcion {
