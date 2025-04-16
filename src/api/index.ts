@@ -8,6 +8,8 @@ import consultorios from './consultorio.routes';
 import profesionales from './profesional.routes';
 import disponibilidad from './disponibilidad.routes';
 import turnos from './turno.routes';
+import reservas from './reserva.routes';
+
 const router = express.Router();
 
 router.get<{}, MessageResponse>('/', (req, res) => {
@@ -23,5 +25,6 @@ router.use('/consultorios', consultorios);
 router.use('/profesionales', profesionales);
 router.use('/disponibilidad', disponibilidad);
 router.use('/turnos', turnos);
+router.use('/reservas', reservas);
 
 export default router;
