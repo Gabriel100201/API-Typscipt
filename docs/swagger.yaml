@@ -1,0 +1,355 @@
+openapi: 3.0.0
+info:
+  title: API Turnos Online
+  version: 1.0.0
+  description: "Documentacióin de la API para gestión de turnos y consultorios"
+servers:
+- url: http://localhost:5000/api/v1
+  description: Servidor local
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        correo:
+          type: string
+        telefono:
+          type: string
+        tipo_usuario:
+          type: string
+          enum:
+          - NORMAL
+          - PLUS
+        fecha_creacion:
+          type: string
+          format: date-time
+        fecha_actualizacion:
+          type: string
+          format: date-time
+security:
+- bearerAuth: []
+tags:
+- name: Usuarios
+  description: Endpoints relacionados con usuarios
+- name: Consultorios
+  description: "Gesti\xF3n de consultorios y sus profesionales"
+- name: Disponibilidad
+  description: "D\xEDas y horarios operativos y excepcionales de profesionales"
+- name: Profesionales
+  description: "Gesti\xF3n de profesionales"
+- name: Auth
+  description: "Registro e inicio de sesi\xF3n"
+- name: Reservas
+  description: "Reserva, cancelaci\xF3n y visualizaci\xF3n de turnos"
+- name: Turnos
+  description: Consulta de turnos disponibles
+paths:
+  /users:
+    get:
+      summary: Obtener todos los usuarios
+      tags:
+      - Usuarios
+      responses:
+        200:
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+  /auth:
+    post:
+      summary: Iniciar sesi\xF3n
+      tags:
+      - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                contrasena:
+                  type: string
+      responses:
+        200:
+          description: Token de acceso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        401:
+          description: Credenciales incorrectas
+  /users/me:
+    get:
+      summary: Obtener mi perfil
+      tags:
+      - Usuarios
+      security:
+      - bearerAuth: []
+      responses:
+        200:
+          description: Perfil de usuario autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        401:
+          description: "Token inv\xE1lido o no enviado"
+    patch:
+      summary: Actualizar mi perfil
+      tags:
+      - Usuarios
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                telefono:
+                  type: string
+      responses:
+        200:
+          description: Perfil actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+  /consultorios:
+    get:
+      summary: Listar todos los consultorios
+      tags:
+      - Consultorios
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de consultorios
+    post:
+      summary: Crear un nuevo consultorio
+      tags:
+      - Consultorios
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Consultorio creado
+        '403':
+          description: Permisos insuficientes
+  /consultorios/{id}:
+    get:
+      summary: Obtener consultorio por ID
+      tags:
+      - Consultorios
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Datos del consultorio
+  /consultorios/{id}/invitar:
+    post:
+      summary: Invitar profesional al consultorio
+      tags:
+      - Consultorios
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Profesional invitado
+        '403':
+          description: Permisos insuficientes
+  /consultorios/{id}/profesionales:
+    get:
+      summary: Listar profesionales de un consultorio
+      tags:
+      - Consultorios
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de profesionales
+  /profesionales:
+    get:
+      summary: Obtener todos los profesionales
+      tags:
+      - Profesionales
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de profesionales
+    post:
+      summary: Crear perfil profesional para el usuario actual
+      tags:
+      - Profesionales
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Perfil profesional creado
+  /profesionales/{id}:
+    get:
+      summary: Obtener un profesional por ID
+      tags:
+      - Profesionales
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Datos del profesional
+  /register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+      - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '201':
+          description: Usuario creado
+  /disponibilidad/dias:
+    get:
+      summary: "Obtener d\xEDas operativos del profesional"
+      tags:
+      - Disponibilidad
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: "D\xEDas operativos listados"
+    post:
+      summary: "Registrar un d\xEDa operativo"
+      tags:
+      - Disponibilidad
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: "D\xEDa operativo creado"
+  /disponibilidad/horarios:
+    post:
+      summary: Registrar horario operativo
+      tags:
+      - Disponibilidad
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Horario creado
+  /disponibilidad/horarios/{dia_id}:
+    get:
+      summary: "Obtener horarios por d\xEDa operativo"
+      tags:
+      - Disponibilidad
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: dia_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Horarios obtenidos
+  /turnos/disponibles:
+    get:
+      summary: Listar turnos disponibles
+      tags:
+      - Turnos
+      responses:
+        '200':
+          description: Turnos listados
+  /reservas:
+    get:
+      summary: Obtener reservas del usuario actual
+      tags:
+      - Reservas
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Reservas obtenidas
+    post:
+      summary: Crear una nueva reserva
+      tags:
+      - Reservas
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Reserva realizada
+  /reservas/profesional:
+    get:
+      summary: Obtener reservas como profesional
+      tags:
+      - Reservas
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Reservas obtenidas
+  /reservas/{id}/cancelar:
+    patch:
+      summary: Cancelar una reserva
+      tags:
+      - Reservas
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Reserva cancelada

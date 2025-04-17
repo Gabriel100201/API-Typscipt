@@ -6,6 +6,7 @@ import cors from 'cors';
 import api from './api';
 import MessageResponse from './interfaces/MessageResponse';
 import { errorHandler, notFound } from './middlewares';
+import { swaggerUiHandler, swaggerUiSetup  } from './lib/swagger';
 
 require('dotenv').config();
 
@@ -22,6 +23,7 @@ app.get<{}, MessageResponse>('/', (req, res) => {
   });
 });
 
+app.use('/docs', swaggerUiHandler, swaggerUiSetup);
 app.use('/api/v1', api);
 
 app.get('/error-test', () => {
