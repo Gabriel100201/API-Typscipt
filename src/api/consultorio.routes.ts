@@ -20,3 +20,5 @@ router.post('/:id/invitar', requireRole('PLUS'), asyncHandler(postInvitarProfesi
 router.get('/:id/profesionales', asyncHandler(getProfesionalesDelConsultorio));
 
 export default router;
+
+/* Rutas para obtener info de los consultorios, para invitar a alguien o crear uno nuevo se debe ser usuario PLUS */

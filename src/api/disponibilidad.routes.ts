@@ -27,3 +27,4 @@ router.get('/excepciones/:id/horarios', asyncHandler(getHorariosExcepcion));
 export default router;
 
 
+/* Rutas para manejar las disponibilad del profesional, para configurar los dias y horarios operativos se necesita ser un usuario con perfil PROFESIONAL */

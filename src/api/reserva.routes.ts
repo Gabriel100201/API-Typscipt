@@ -19,3 +19,5 @@ router.get('/profesional', asyncHandler(requireProfesional), asyncHandler(getRes
 router.patch('/:id/cancelar', asyncHandler(patchCancelarReserva));
 
 export default router;
+
+/* Rutas para manejar las reservas, si se quiere ver las reservas como profesional se debe validar si el usuario es profesional antes  */

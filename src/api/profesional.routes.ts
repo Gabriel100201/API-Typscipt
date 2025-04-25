@@ -16,3 +16,5 @@ router.get('/', asyncHandler(getProfesionales));
 router.get('/:id', asyncHandler(getProfesionalPorId));
 
 export default router;
+
+/* Rutas para administrar informacion de un profesional, cada usuario puede tener asociado un perfil profesional */

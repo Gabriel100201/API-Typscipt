@@ -7,3 +7,5 @@ const router = Router();
 router.post('/', asyncHandler(loginUsuario));
 
 export default router;
+
+/* Loguin del usuario */
